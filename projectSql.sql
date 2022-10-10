@@ -12,6 +12,7 @@ create table if not exists tickets (
 	amount float not null,
 	description VARCHAR(500) not null,
 	status VARCHAR(50) not null,
+	create_date timestamp default current_timestamp,
 	user_id int not null,
 	foreign key(user_id) references users(user_id)
 );

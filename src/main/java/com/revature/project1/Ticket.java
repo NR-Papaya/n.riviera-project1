@@ -5,15 +5,24 @@ import java.util.Objects;
 public class Ticket {
 	private float amount;
 	private String description;
-	private String status;
+	private String status = "pending";
 	private String user_id;
 	
-	public Ticket(float amount, String description, String status, String userName) {
+	
+	
+	public Ticket(float amount, String description, String user_id) {
+		super();
+		this.amount = amount;
+		this.description = description;
+		this.user_id = user_id;
+	}
+
+	public Ticket(float amount, String description, String status, String user_id) {
 		super();
 		this.amount = amount;
 		this.description = description;
 		this.status = status;
-		this.user_id = userName;
+		this.user_id = user_id;
 	}
 
 	public float getAmount() {
@@ -50,7 +59,7 @@ public class Ticket {
 
 	@Override
 	public String toString() {
-		return "Ticket [amount=" + amount + ", description=" + description + ", status=" + status + ", userName="
+		return "Ticket [amount=" + amount + ", description=" + description + ", status=" + status + ", user_id="
 				+ user_id + "]";
 	}
 
