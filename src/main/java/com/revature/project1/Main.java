@@ -7,34 +7,49 @@ public class Main {
 
 	public static void main(String[] args) {
 		Javalin app = Javalin.create().start(8000);
-		
-		//generate a new user
+
+		// generate a new user
 		app.post("/register", (Context ctx) -> {
 			System.out.println("register");
 		});
 
-		//create session instance
+		// create session instance
 		app.get("/login", (Context ctx) -> {
 			System.out.println("login");
 		});
-		
-		//remove session instance
+
+		// remove session instance
 		app.get("/logout", (Context ctx) -> {
 			System.out.println("logout");
 		});
 
-		//get tickets for a specific session user
+		// get tickets for a specific session user
 		app.get("/tickets/employee", (Context ctx) -> {
 			System.out.println("employee view");
 		});
-		
+
 		// create tickets
 		app.post("/tickets/create", (Context ctx) -> {
 			System.out.println("create ticket");
 		});
 
-		// view all pending tickets
+		// view all tickets
 		app.get("tickets/view", (Context ctx) -> {
+			System.out.println("master view");
+		});
+
+		// view all pending tickets
+		app.get("tickets/view/pending", (Context ctx) -> {
+			System.out.println("master view");
+		});
+
+		// view all approved tickets
+		app.get("tickets/view/approved", (Context ctx) -> {
+			System.out.println("master view");
+		});
+
+		// view all denied tickets
+		app.get("tickets/view/denied", (Context ctx) -> {
 			System.out.println("master view");
 		});
 
