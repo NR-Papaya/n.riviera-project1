@@ -7,9 +7,8 @@ public class Ticket {
 	private String description;
 	private String status = "pending";
 	private String user_id;
-	
-	
-	
+	private String create_date = null;
+
 	public Ticket(float amount, String description, String user_id) {
 		super();
 		this.amount = amount;
@@ -23,6 +22,15 @@ public class Ticket {
 		this.description = description;
 		this.status = status;
 		this.user_id = user_id;
+	}
+
+	public Ticket(float amount, String description, String status, String user_id, String create_date) {
+		super();
+		this.amount = amount;
+		this.description = description;
+		this.status = status;
+		this.user_id = user_id;
+		this.create_date = create_date;
 	}
 
 	public float getAmount() {
@@ -81,6 +89,5 @@ public class Ticket {
 				&& Objects.equals(description, other.description) && Objects.equals(status, other.status)
 				&& Objects.equals(user_id, other.user_id);
 	}
-	
-	
+
 }
