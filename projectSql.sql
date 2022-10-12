@@ -9,12 +9,12 @@ create table if not exists users (
 
 create table if not exists tickets (
 	ticket_id serial primary key unique,
-	amount float not null,
-	description VARCHAR(500) not null,
-	status VARCHAR(50) not null,
-	create_date timestamp default current_timestamp,
-	user_id int not null,
-	foreign key(user_id) references users(user_id)
+	ticket_amount float not null,
+	ticket_description VARCHAR(500) not null,
+	ticket_status VARCHAR(50) not null,
+	ticket_create_date timestamp default current_timestamp,
+	ticket_user_id int not null,
+	foreign key(ticket_user_id) references users(user_id)
 );
 
 insert into "users"(user_name ,password ,role ,f_name ,l_name ) values
@@ -22,7 +22,7 @@ insert into "users"(user_name ,password ,role ,f_name ,l_name ) values
 ('Jane.doe','56789','Manager','Jane','Doe')
 ;
 
-insert into "tickets"(amount,description,status,user_id) values
+insert into "tickets"(ticket_amount,ticket_description,ticket_status,ticket_user_id) values
 (50.00,'gas to and from client location','pending',1),
 (75.25,'overnight hotel lodging for expo detail','pending',2)
 ;

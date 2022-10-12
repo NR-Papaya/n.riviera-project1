@@ -20,19 +20,19 @@ public class Driver {
 		app.get("/person/{id}", (Context ctx) ->{
 //			ctx.res().getWriter().write("Hello, Client");
 			Set<Person> people = new HashSet<>();
-			Person person = new Person(1,"nahia",34);
-			Person person1 = new Person(2,"Radwa",39);
+			Person person = new Person(1,"Nahia","AR","blue",39);
+			Person person1 = new Person(2,"Radwa","AR","green",39);
 			people.add(person);
 			people.add(person1);
 			
 			Person selectedPerson = null;
 			
 			for (Person p:people) {
-				if (p.getId() == Integer.parseInt(ctx.pathParam("id"))) {
+				if (p.getPerson_id() == Integer.parseInt(ctx.pathParam("id"))) {
 					selectedPerson = p;
 				}
 			}
-			
+//			ctx.json(people);  can also send a JSON set
 			ctx.json(selectedPerson);
 		});
 		
