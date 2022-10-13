@@ -1,4 +1,4 @@
-package com.revature.project1;
+package com.revature.model;
 
 import java.util.Objects;
 
@@ -9,6 +9,11 @@ public class Ticket {
 	private String ticket_status = "pending";
 	private int ticket_user_id;
 	private String ticket_create_date = null;
+	
+	
+	public Ticket() {
+		super();
+	}
 	
 	public Ticket(float ticket_amount, String ticket_description, String ticket_status, int ticket_user_id) {
 		super();
