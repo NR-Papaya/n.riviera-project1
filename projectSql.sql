@@ -23,11 +23,14 @@ insert into "users"(user_name ,password ,role ,f_name ,l_name ) values
 ;
 
 insert into "tickets"(ticket_amount,ticket_description,ticket_status,ticket_user_id) values
-(50.00,'gas to and from client location','pending',1),
-(75.25,'overnight hotel lodging for expo detail','pending',2)
+(50.00,'gas to and from client location','approved',1),
+(75.25,'overnight hotel lodging for expo detail','denied',2),
+(25.00,'books','pending',1)
 ;
 
 select * from "users";
 select * from "tickets";
 
 drop table users,tickets;
+
+DROP TABLE person,colors;

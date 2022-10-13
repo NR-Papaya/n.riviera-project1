@@ -38,33 +38,34 @@ public class Main {
 				e.printStackTrace();
 			}
 		});
+		//------------------------------------------------------
 		// generate a new user
 		app.post("/register", (Context ctx) -> {
 			
 			System.out.println("register");
 		});
-
+		//------------------------------------------------------
 		// create session instance
 		app.get("/login", (Context ctx) -> {
 			System.out.println("login");
 		});
-
+		//------------------------------------------------------
 		// remove session instance
 		app.get("/logout", (Context ctx) -> {
 			System.out.println("logout");
 		});
-
+		//------------------------------------------------------
 		// get tickets for a specific session user
 		app.get("/tickets/employee", (Context ctx) -> {
 			System.out.println("employee view");
 			
 		});
-
+		//------------------------------------------------------
 		// create tickets
 		app.post("/tickets/create", (Context ctx) -> {
 			System.out.println("create ticket");
 		});
-
+		//------------------------------------------------------
 		// view all tickets
 		app.get("tickets/view", (Context ctx) -> {
 			Statement stmt = null;
@@ -156,7 +157,7 @@ public class Main {
 				}
 			}
 			
-			System.out.println("master view");
+			System.out.println("pending view");
 			
 			if (ticketList.size() == 0) {
 				ctx.result("No results");
@@ -164,7 +165,7 @@ public class Main {
 				ctx.json(ticketList);
 			}
 		});
-
+		//-------------------------------------------------------------------------
 		// view all approved tickets
 		app.get("tickets/view/approved", (Context ctx) -> {
 			Statement stmt = null;
@@ -206,7 +207,7 @@ public class Main {
 				}
 			}
 			
-			System.out.println("master view");
+			System.out.println("approved view");
 			
 			if (ticketList.size() == 0) {
 				ctx.result("No results");
@@ -216,12 +217,57 @@ public class Main {
 			
 			
 		});
-
+		//-------------------------------------------------------------------
 		// view all denied tickets
 		app.get("tickets/view/denied", (Context ctx) -> {
-			System.out.println("master view");
+			Statement stmt = null;
+			ResultSet set = null;
+			
+			List<Ticket> ticketList = new ArrayList<>();
+			
+			try {
+				stmt = conn.createStatement();
+				set = stmt.executeQuery("select * from tickets where ticket_status = 'denied' order by ticket_id asc");
+				set.next();
+				
+				while (true) {
+					Ticket newTicket = new Ticket(
+							set.getInt("ticket_id"),
+							set.getFloat("ticket_amount"),
+							set.getString("ticket_description"),
+							set.getString("ticket_status"),
+							set.getInt("ticket_user_id"),
+							set.getString("ticket_create_date")
+							);
+					ticketList.add(newTicket);
+					
+					if (set.isLast()) {
+						break;
+					}else {
+						set.next();
+					}
+				}
+					
+			}catch(SQLException e) {
+				
+			}finally {
+				try {
+					stmt.close();
+					set.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			System.out.println("denied view");
+			
+			if (ticketList.size() == 0) {
+				ctx.result("No results");
+			}else {
+				ctx.json(ticketList);
+			}
 		});
-
+		//-------------------------------------------------------------------
 		// update ticket status
 		app.put("tickets/{ticket_id}", (Context ctx) -> {
 			System.out.println("update ticket");
