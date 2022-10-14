@@ -108,24 +108,25 @@ public class Driver {
 		});
 		//-------------------------------------------------------------------
 		// update ticket status
+		// query with a key of status must be affixed to url. ("approved" or "denied")
 		app.put("tickets/{ticket_id}", (Context ctx) -> {
-			/*
-			 * Get ticket ID from path param
-			 * convert ID to int
-			 * call TicketRepository.updateStatus()
-			 * ctx.json Ticket response in JSON
-			 * 
-			 * TODO: Implement update method in TicketRepository
-			 * 
-			 */
 			int ticketID = Integer.parseInt(ctx.pathParam("ticket_id"));
+			String queryStatus = ctx.queryParam("status");
 			
-			if (TicketRepository.validateTicketId(ticketID)) { 
+			
+			if (TicketRepository.validateTicketId(ticketID) && TicketRepository.validateUpdateStatus(queryStatus)) { 
 				Ticket ticket = TicketRepository.findTicketById(ticketID);
-				System.out.println(ticket.toString());
-				ctx.json(ticket);
+				
+				if (TicketRepository.validateTicketStatus(ticket)) {
+					ticket = TicketRepository.updateStatus(ticket, queryStatus);
+					ctx.json(ticket);
+				}else {
+					ctx.result("Ticket Status Immutable");
+				}
+				
+				
 			}else {
-				ctx.result("Invalid ticket_id");
+				ctx.result("Invalid input");
 			}
 			System.out.println("update ticket");
 		});

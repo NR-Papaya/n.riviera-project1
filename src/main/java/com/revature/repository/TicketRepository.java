@@ -14,7 +14,7 @@ import com.revature.utils.ConnectionFactory;
 public class TicketRepository {
 
 //********************* VALIDATION METHODS ***********************************************
-	//-----------------------------------------------------------------------
+
 	// Validates Ticket ID: True = Valid -- false = invalid
 	public static boolean validateTicketId(int id) {
 		PreparedStatement pstmt = null;
@@ -41,6 +41,29 @@ public class TicketRepository {
 			}
 		}
 		return validStatus;
+	}
+	
+	// ---------------------------------------------------------------------
+	// Validates query string status value: True = valid -- False = invalid
+	public static boolean validateUpdateStatus(String status) {
+		boolean validStatus = false;
+		
+		if (status.equals("approved") || status.equals("denied")) {
+			validStatus = true;
+		}
+		return validStatus;
+	}
+	
+	// ---------------------------------------------------------------------
+	// Validate ticket status is pending
+	public static boolean validateTicketStatus(Ticket ticket) {
+		boolean validTicketStatus = false;
+		
+		if (ticket.getTicket_status().equals("pending")) {
+			validTicketStatus = true;
+		}
+		
+		return validTicketStatus;
 	}
 
 //********************* CREATE METHODS ***************************************************
@@ -219,16 +242,34 @@ public class TicketRepository {
 	}
 //********************* UPDATE METHODS ******************************************************
 
-//	public static Ticket updateStatus(Ticket ticketToUpdate,String status) {
-//		/*
-//		 * readTicket by ID
-//		 * set ticket_status to status
-//		 * readTicket by ID
-//		 * return updated ticket
-//		 */
-//		
-//		return new Ticket();
-//	}
+	public static Ticket updateStatus(Ticket ticketToUpdate,String status) {
+		/*
+		 * readTicket by ID
+		 * set ticket_status to status
+		 * readTicket by ID
+		 * return updated ticket
+		 */
+		PreparedStatement pstmt = null;
+		int ticketId = ticketToUpdate.getTicket_id();
+		
+		try(Connection conn = ConnectionFactory.getConnection()){
+			String SQL = "update tickets set ticket_status = ? where ticket_id="+ticketId;
+			pstmt = conn.prepareStatement(SQL);
+			pstmt.setString(1, status);
+			pstmt.execute();
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally{
+			try {
+				pstmt.close();
+			}catch(SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		Ticket updatedTicket = TicketRepository.findTicketById(ticketId);
+		
+		return updatedTicket;
+	}
 
 //********************* DELETE METHODS ******************************************************
 
