@@ -1,4 +1,4 @@
-package com.revature.project1;
+package com.revature.driver;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -46,6 +46,16 @@ public class Driver {
 		//------------------------------------------------------
 		// create tickets
 		app.post("/tickets/create", (Context ctx) -> {
+			
+			Ticket newTicket = ctx.bodyAsClass(Ticket.class);
+			
+			if (TicketRepository.isValidTicket(newTicket)) {
+				TicketRepository.addTicket(newTicket);
+				ctx.result("Ticket Created");
+			}else {
+				ctx.result("Invalid Ticket");
+			}
+			
 			System.out.println("create ticket");
 		});
 		//------------------------------------------------------

@@ -10,6 +10,7 @@ import java.util.List;
 
 import com.revature.model.Ticket;
 import com.revature.utils.ConnectionFactory;
+import com.revature.repository.UserRepository;
 
 public class TicketRepository {
 
@@ -65,9 +66,47 @@ public class TicketRepository {
 		
 		return validTicketStatus;
 	}
+	
+	public static boolean isValidTicket(Ticket ticket) {
+		boolean isValid = false;
+		if (ticket.getTicket_amount() > 0 && 
+				ticket.getTicket_description().length() > 0 &&
+				ticket.getTicket_status().equals("pending") &&
+				UserRepository.validateUserId(ticket.getTicket_user_id())
+				) {
+			isValid = true;
+		}
+		
+		
+		return isValid;
+	}
 
 //********************* CREATE METHODS ***************************************************
 
+	public static void addTicket(Ticket ticket) {
+
+		PreparedStatement pstmt = null;
+		
+		try(Connection conn = ConnectionFactory.getConnection()){
+			String SQL = "insert into tickets(ticket_id,ticket_amount,ticket_description,ticket_status,ticket_create_date,ticket_user_id)"
+					+ " values (default,?,?,?,default,?)";
+			pstmt = conn.prepareStatement(SQL);
+			pstmt.setFloat(1, ticket.getTicket_amount());
+			pstmt.setString(2, ticket.getTicket_description());
+			pstmt.setString(3,ticket.getTicket_status());
+			pstmt.setInt(4, ticket.getTicket_user_id());
+			pstmt.execute();
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally{
+			try {
+				pstmt.close();
+			}catch(SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 //********************* READ METHODS *****************************************************
 
 	// ---------------------------------------------------------------------
@@ -243,12 +282,7 @@ public class TicketRepository {
 //********************* UPDATE METHODS ******************************************************
 
 	public static Ticket updateStatus(Ticket ticketToUpdate,String status) {
-		/*
-		 * readTicket by ID
-		 * set ticket_status to status
-		 * readTicket by ID
-		 * return updated ticket
-		 */
+
 		PreparedStatement pstmt = null;
 		int ticketId = ticketToUpdate.getTicket_id();
 		

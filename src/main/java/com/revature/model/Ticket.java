@@ -15,6 +15,25 @@ public class Ticket {
 		super();
 	}
 	
+	
+	
+	public Ticket(float ticket_amount, String ticket_description) {
+		super();
+		this.ticket_amount = ticket_amount;
+		this.ticket_description = ticket_description;
+	}
+
+
+
+	public Ticket(float ticket_amount, String ticket_description, int ticket_user_id) {
+		super();
+		this.ticket_amount = ticket_amount;
+		this.ticket_description = ticket_description;
+		this.ticket_user_id = ticket_user_id;
+	}
+
+
+
 	public Ticket(float ticket_amount, String ticket_description, String ticket_status, int ticket_user_id) {
 		super();
 		this.ticket_amount = ticket_amount;
