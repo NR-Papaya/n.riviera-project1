@@ -2,14 +2,22 @@ package com.revature.model;
 
 import java.util.Objects;
 
-public class User {
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class TicketUser {
+	@JsonProperty("user_name")
 	private String user_name;
 	private String role = "Employee";
 	private String password;
 	private String f_name;
 	private String l_name;
 	
-	public User(String user_name, String password, String f_name, String l_name) {
+	
+	public TicketUser() {
+		super();
+	}
+
+	public TicketUser(String user_name, String password, String f_name, String l_name) {
 		super();
 		this.user_name = user_name;
 		this.password = password;
@@ -17,7 +25,7 @@ public class User {
 		this.l_name = l_name;
 	}
 
-	public User(String user_name, String role, String password, String f_name, String l_name) {
+	public TicketUser(String user_name, String role, String password, String f_name, String l_name) {
 		super();
 		this.user_name = user_name;
 		this.role = role;
@@ -79,7 +87,7 @@ public class User {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		User other = (User) obj;
+		TicketUser other = (TicketUser) obj;
 		return Objects.equals(f_name, other.f_name) && Objects.equals(l_name, other.l_name)
 				&& Objects.equals(password, other.password) && Objects.equals(role, other.role)
 				&& Objects.equals(user_name, other.user_name);

@@ -1,15 +1,13 @@
 package com.revature.driver;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
+
 import java.util.List;
 
 import com.revature.model.Ticket;
+import com.revature.model.TicketUser;
 import com.revature.repository.TicketRepository;
+import com.revature.repository.UserRepository;
 
 import io.javalin.Javalin;
 import io.javalin.http.Context;
@@ -24,7 +22,18 @@ public class Driver {
 		//------------------------------------------------------
 		// generate a new user
 		app.post("/register", (Context ctx) -> {
-
+			
+			TicketUser newUser = ctx.bodyAsClass(TicketUser.class);
+			
+			if (!UserRepository.availableUserName(newUser.getUserName())) {
+				ctx.result("user_name unavailable");
+			}else if(UserRepository.isValidUserObj(newUser)){
+					UserRepository.addUser(newUser);
+					ctx.result("User Created");
+			}else {
+					ctx.result("Invalid Input");
+				}
+			
 			System.out.println("register");
 		});
 		//------------------------------------------------------
@@ -40,6 +49,20 @@ public class Driver {
 		//------------------------------------------------------
 		// get tickets for a specific session user
 		app.get("/tickets/employee", (Context ctx) -> {
+			/*
+			 * validate using session to get employee id
+			 * get employee id
+			 * query all tickets using validated employee id
+			 * ctx json collection object with all tickets under the id 
+			 */
+			int id = 2; //*******IMPLEMENT USING SESSION TO GET ID
+			if (UserRepository.validateUserId(id)) {
+				ctx.json(TicketRepository.listByUser(id));
+			}else {
+				ctx.result("Bad request").status(404);
+			}
+			
+			
 			System.out.println("employee view");
 
 		});

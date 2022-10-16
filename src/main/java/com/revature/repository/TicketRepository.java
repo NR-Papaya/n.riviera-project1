@@ -140,7 +140,36 @@ public class TicketRepository {
 
 	// ---------------------------------------------------------------------
 	public static List<Ticket> listByUser(int id) {
-		return new ArrayList<Ticket>();
+		Statement stmt = null;
+		ResultSet set = null;
+
+		List<Ticket> ticketList = new ArrayList<>();
+
+		try (Connection conn = ConnectionFactory.getConnection()) {
+			stmt = conn.createStatement();
+			set = stmt.executeQuery("select * from tickets where ticket_user_id="+id+" order by ticket_id asc");
+
+			while (set.next()) {
+				Ticket newTicket = new Ticket(set.getInt("ticket_id"), set.getFloat("ticket_amount"),
+						set.getString("ticket_description"), set.getString("ticket_status"),
+						set.getInt("ticket_user_id"), set.getString("ticket_create_date"));
+
+				ticketList.add(newTicket);
+
+			}
+
+		} catch (SQLException e) {
+
+		} finally {
+			try {
+				stmt.close();
+				set.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return ticketList;
 	}
 
 	// ---------------------------------------------------------------------
