@@ -5,7 +5,7 @@ import java.sql.Connection;
 import java.util.List;
 
 import com.revature.model.Ticket;
-import com.revature.model.TicketUser;
+import com.revature.model.User;
 import com.revature.repository.TicketRepository;
 import com.revature.repository.UserRepository;
 
@@ -23,7 +23,7 @@ public class Driver {
 		// generate a new user
 		app.post("/register", (Context ctx) -> {
 			
-			TicketUser newUser = ctx.bodyAsClass(TicketUser.class);
+			User newUser = ctx.bodyAsClass(User.class);
 			
 			if (!UserRepository.availableUserName(newUser.getUserName())) {
 				ctx.result("user_name unavailable");

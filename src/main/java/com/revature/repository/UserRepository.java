@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.revature.model.Ticket;
-import com.revature.model.TicketUser;
+import com.revature.model.User;
 import com.revature.utils.ConnectionFactory;
 
 public class UserRepository {
@@ -40,7 +40,10 @@ public class UserRepository {
 			return validStatus;
 		}
 		//----------------------------------------------------
-		public static boolean isValidUserObj(TicketUser user) {
+		// Validates that the new User object has no empty string fields
+		// and that the role is equal to Employee or Manager
+		// VALIDATES USER OBJ -- TRUE = VALID OBJ ---- FALSE = INVALID OBJ
+		public static boolean isValidUserObj(User user) {
 			
 			boolean isValid = false;
 			
@@ -54,11 +57,11 @@ public class UserRepository {
 					) {
 				isValid = true;
 			}
-			
-			
 			return isValid;
 		}
 		//------------------------------------------------------
+		//Checks to see if a userName is available
+		//VALIDATES USERNAME -- TRUE=USERNAME AVAILABLE --- FALSE=USER NAME TAKEN
 		public static boolean availableUserName(String userName) {
 			boolean isValid = true;
 			
@@ -73,7 +76,6 @@ public class UserRepository {
 				if (set.next()) {
 					isValid = false;
 				}
-
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} finally {
@@ -84,13 +86,11 @@ public class UserRepository {
 					e.printStackTrace();
 				}
 			}
-			
-			
 			return isValid;
 		}
 		
 //********************* CREATE METHODS ***********************************************
-		public static void addUser(TicketUser user) {
+		public static void addUser(User user) {
 
 			PreparedStatement pstmt = null;
 			
@@ -119,6 +119,5 @@ public class UserRepository {
 //********************* UPDATE METHODS ***********************************************
 	
 //********************* DELETE METHODS ***********************************************
-	
 	
 }
