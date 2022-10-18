@@ -89,6 +89,7 @@ public class UserRepository {
 			return isValid;
 		}
 		
+		
 //********************* CREATE METHODS ***********************************************
 		public static void addUser(User user) {
 
@@ -115,7 +116,45 @@ public class UserRepository {
 			}
 		}
 //********************* READ METHODS ***********************************************
-	
+		//--------------------------------------------------------------
+				// returns a valid user object if authenticated
+						public static User authenticateUser(User loginUser) {
+							PreparedStatement pstmt = null;
+							ResultSet set = null;
+							User authenticatedUser = null;
+
+							try (Connection conn = ConnectionFactory.getConnection()) {
+								String SQL = "Select * from users where user_name=? and password=?";
+								pstmt = conn.prepareStatement(SQL);
+								pstmt.setString(1, loginUser.getUserName());
+								pstmt.setString(2, loginUser.getPassword());
+								set = pstmt.executeQuery();
+								if (set.next()) {
+									// user_name, role, password, f_name, l_name
+									authenticatedUser = new User(
+											set.getInt("user_id"),
+											set.getString("user_name"),
+											set.getString("role"),
+											set.getString("password"),
+											set.getString("f_name"),
+											set.getString("l_name")
+											);
+								}else {
+									authenticatedUser = new User();
+								}
+
+							} catch (SQLException e) {
+								e.printStackTrace();
+							} finally {
+								try {
+									pstmt.close();
+									set.close();
+								} catch (SQLException e) {
+									e.printStackTrace();
+								}
+							}
+							return authenticatedUser;
+						}
 //********************* UPDATE METHODS ***********************************************
 	
 //********************* DELETE METHODS ***********************************************

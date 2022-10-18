@@ -1,5 +1,6 @@
 package com.revature.driver;
 
+import java.security.Key;
 import java.sql.Connection;
 
 import java.util.List;
@@ -8,9 +9,14 @@ import com.revature.model.Ticket;
 import com.revature.model.User;
 import com.revature.repository.TicketRepository;
 import com.revature.repository.UserRepository;
+import com.revature.utils.JwtFactory;
 
 import io.javalin.Javalin;
 import io.javalin.http.Context;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
 
 public class Driver {
 
@@ -18,7 +24,7 @@ public class Driver {
 
 	public static void main(String[] args) {
 		Javalin app = Javalin.create().start(8000);
-
+		
 		//------------------------------------------------------
 		// generate a new user
 		app.post("/register", (Context ctx) -> {
@@ -33,35 +39,54 @@ public class Driver {
 			}else {
 					ctx.result("Invalid Input");
 				}
-			
 			System.out.println("register");
 		});
 		//------------------------------------------------------
 		// create session instance
-		app.get("/login", (Context ctx) -> {
+		app.post("/login", (Context ctx) -> {
+			
+			User loginUser = ctx.bodyAsClass(User.class);
+			
+			User authenticatedUser = UserRepository.authenticateUser(loginUser);
+			
+			if (authenticatedUser.getUser_id() > 0) {
+				ctx.cookie("jwt", JwtFactory.jwsStringFactory(authenticatedUser))
+				.result("Login Successful");
+			} else {
+				ctx.result("Invalid Credentials");
+			}
+			
 			System.out.println("login");
 		});
 		//------------------------------------------------------
 		// remove session instance
 		app.get("/logout", (Context ctx) -> {
+			Cookie[] cookies = ctx.req().getCookies();
+
+			for (Cookie cookie : cookies) {
+				if (cookie.getName().equals("jwt")) {
+					cookie.setMaxAge(0);
+					ctx.res().addCookie(cookie);
+					ctx.result("Logout Successful");
+					break;
+				}
+			}
 			System.out.println("logout");
 		});
 		//------------------------------------------------------
 		// get tickets for a specific session user
 		app.get("/tickets/employee", (Context ctx) -> {
-			/*
-			 * validate using session to get employee id
-			 * get employee id
-			 * query all tickets using validated employee id
-			 * ctx json collection object with all tickets under the id 
-			 */
-			int id = 2; //*******IMPLEMENT USING SESSION TO GET ID
-			if (UserRepository.validateUserId(id)) {
-				ctx.json(TicketRepository.listByUser(id));
+			String idString = JwtFactory.parseJwtBody(ctx.cookie("jwt"), "user_id");
+			if (!idString.equals("invalid")) {
+				int id = Integer.parseInt(idString);
+				if (UserRepository.validateUserId(id)) {
+					ctx.json(TicketRepository.listByUser(id));
+				}else {
+					ctx.result("Bad request").status(404);
+				}
 			}else {
-				ctx.result("Bad request").status(404);
+				ctx.result("Login required");
 			}
-			
 			
 			System.out.println("employee view");
 

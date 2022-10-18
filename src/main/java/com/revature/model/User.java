@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class User {
+	private int user_id;
 	@JsonProperty("user_name")
 	private String user_name;
 	private String role = "Employee";
@@ -16,6 +17,16 @@ public class User {
 	public User() {
 		super();
 	}
+	
+	
+	
+	public User(String user_name, String password) {
+		super();
+		this.user_name = user_name;
+		this.password = password;
+	}
+
+
 
 	public User(String user_name, String password, String f_name, String l_name) {
 		super();
@@ -32,6 +43,27 @@ public class User {
 		this.password = password;
 		this.f_name = f_name;
 		this.l_name = l_name;
+	}
+
+	public User(int user_id, String user_name, String role, String password, String f_name, String l_name) {
+		super();
+		this.user_id = user_id;
+		this.user_name = user_name;
+		this.role = role;
+		this.password = password;
+		this.f_name = f_name;
+		this.l_name = l_name;
+	}
+
+
+
+	
+	public int getUser_id() {
+		return user_id;
+	}
+
+	public void setUser_id(int user_id) {
+		this.user_id = user_id;
 	}
 
 	public String getUserName() {
