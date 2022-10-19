@@ -54,7 +54,6 @@ public class Driver {
 			} else {
 				ctx.result("Invalid Credentials");
 			}
-
 			System.out.println("login");
 		});
 		// ------------------------------------------------------
@@ -87,9 +86,7 @@ public class Driver {
 			} else {
 				ctx.result("Login required");
 			}
-
 			System.out.println("employee view");
-
 		});
 		// ------------------------------------------------------
 		// create tickets
@@ -129,7 +126,6 @@ public class Driver {
 			} else {
 				ctx.result("Unauthorized");
 			}
-
 			System.out.println("master view");
 		});
 		// --------------------------------------------------------
@@ -148,7 +144,6 @@ public class Driver {
 			} else {
 				ctx.result("Unauthorized");
 			}
-
 			System.out.println("pending view");
 		});
 		// -------------------------------------------------------------------------
@@ -207,7 +202,6 @@ public class Driver {
 					} else {
 						ctx.result("Ticket Status Immutable");
 					}
-
 				} else {
 					ctx.result("Invalid input");
 				}
@@ -215,7 +209,6 @@ public class Driver {
 			} else {
 				ctx.result("Unauthorized");
 			}
-
 			System.out.println("update ticket");
 		});
 	}
