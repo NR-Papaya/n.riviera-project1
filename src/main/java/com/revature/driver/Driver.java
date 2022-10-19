@@ -24,41 +24,40 @@ public class Driver {
 
 	public static void main(String[] args) {
 		Javalin app = Javalin.create().start(8000);
-		
-		//------------------------------------------------------
+
+		// ------------------------------------------------------
 		// generate a new user
 		app.post("/register", (Context ctx) -> {
-			
+
 			User newUser = ctx.bodyAsClass(User.class);
-			
+
 			if (!UserRepository.availableUserName(newUser.getUserName())) {
 				ctx.result("user_name unavailable");
-			}else if(UserRepository.isValidUserObj(newUser)){
-					UserRepository.addUser(newUser);
-					ctx.result("User Created");
-			}else {
-					ctx.result("Invalid Input");
-				}
+			} else if (UserRepository.isValidUserObj(newUser)) {
+				UserRepository.addUser(newUser);
+				ctx.result("User Created");
+			} else {
+				ctx.result("Invalid Input");
+			}
 			System.out.println("register");
 		});
-		//------------------------------------------------------
+		// ------------------------------------------------------
 		// create session instance
 		app.post("/login", (Context ctx) -> {
-			
+
 			User loginUser = ctx.bodyAsClass(User.class);
-			
+
 			User authenticatedUser = UserRepository.authenticateUser(loginUser);
-			
+
 			if (authenticatedUser.getUser_id() > 0) {
-				ctx.cookie("jwt", JwtFactory.jwsStringFactory(authenticatedUser))
-				.result("Login Successful");
+				ctx.cookie("jwt", JwtFactory.jwsStringFactory(authenticatedUser)).result("Login Successful");
 			} else {
 				ctx.result("Invalid Credentials");
 			}
-			
+
 			System.out.println("login");
 		});
-		//------------------------------------------------------
+		// ------------------------------------------------------
 		// remove session instance
 		app.get("/logout", (Context ctx) -> {
 			Cookie[] cookies = ctx.req().getCookies();
@@ -73,119 +72,150 @@ public class Driver {
 			}
 			System.out.println("logout");
 		});
-		//------------------------------------------------------
+		// ------------------------------------------------------
 		// get tickets for a specific session user
 		app.get("/tickets/employee", (Context ctx) -> {
 			String idString = JwtFactory.parseJwtBody(ctx.cookie("jwt"), "user_id");
-			if (!idString.equals("invalid")) {
+			String roleString = JwtFactory.parseJwtBody(ctx.cookie("jwt"), "role");
+			if (!idString.equals("invalid") && roleString.equals("Employee")) {
 				int id = Integer.parseInt(idString);
 				if (UserRepository.validateUserId(id)) {
 					ctx.json(TicketRepository.listByUser(id));
-				}else {
+				} else {
 					ctx.result("Bad request").status(404);
 				}
-			}else {
+			} else {
 				ctx.result("Login required");
 			}
-			
+
 			System.out.println("employee view");
 
 		});
-		//------------------------------------------------------
+		// ------------------------------------------------------
 		// create tickets
 		app.post("/tickets/create", (Context ctx) -> {
+
+			String roleString = JwtFactory.parseJwtBody(ctx.cookie("jwt"), "role");
+			String idString = JwtFactory.parseJwtBody(ctx.cookie("jwt"), "user_id");
 			
-			Ticket newTicket = ctx.bodyAsClass(Ticket.class);
-			
-			if (TicketRepository.isValidTicket(newTicket)) {
-				TicketRepository.addTicket(newTicket);
-				ctx.result("Ticket Created");
-			}else {
-				ctx.result("Invalid Ticket");
+			if (roleString.equals("Employee")) {
+				Ticket newTicket = ctx.bodyAsClass(Ticket.class);
+				newTicket.setTicket_user_id(Integer.parseInt(idString));
+
+				if (TicketRepository.isValidTicket(newTicket)) {
+					TicketRepository.addTicket(newTicket);
+					ctx.result("Ticket Created");
+				} else {
+					ctx.result("Invalid Ticket");
+				}
+			} else {
+				ctx.result("Unauthorized");
 			}
-			
+
 			System.out.println("create ticket");
 		});
-		//------------------------------------------------------
+		// ------------------------------------------------------
 		// view all tickets
 		app.get("tickets/view", (Context ctx) -> {
+			String roleString = JwtFactory.parseJwtBody(ctx.cookie("jwt"), "role");
+			if (!roleString.equals("invalid") && roleString.equals("Manager")) {
+				List<Ticket> ticketList = TicketRepository.listAll();
 
-			List<Ticket> ticketList = TicketRepository.listAll();
-
-			
-			System.out.println("master view");
-
-			if (ticketList.size() == 0) {
-				ctx.result("No results");
-			}else {
-				ctx.json(ticketList);
+				if (ticketList.size() == 0) {
+					ctx.result("No results");
+				} else {
+					ctx.json(ticketList);
+				}
+			} else {
+				ctx.result("Unauthorized");
 			}
+
+			System.out.println("master view");
 		});
-		//--------------------------------------------------------
+		// --------------------------------------------------------
 		// view all pending tickets
 		app.get("tickets/view/pending", (Context ctx) -> {
-			List<Ticket> ticketList = TicketRepository.listPending();
-			
-			System.out.println("pending view");
 
-			if (ticketList.size() == 0) {
-				ctx.result("No results");
-			}else {
-				ctx.json(ticketList);
+			String roleString = JwtFactory.parseJwtBody(ctx.cookie("jwt"), "role");
+			if (!roleString.equals("invalid") && roleString.equals("Manager")) {
+				List<Ticket> ticketList = TicketRepository.listPending();
+
+				if (ticketList.size() == 0) {
+					ctx.result("No results");
+				} else {
+					ctx.json(ticketList);
+				}
+			} else {
+				ctx.result("Unauthorized");
 			}
+
+			System.out.println("pending view");
 		});
-		//-------------------------------------------------------------------------
+		// -------------------------------------------------------------------------
 		// view all approved tickets
 		app.get("tickets/view/approved", (Context ctx) -> {
 
-			List<Ticket> ticketList = TicketRepository.listApproved();
+			String roleString = JwtFactory.parseJwtBody(ctx.cookie("jwt"), "role");
+			if (!roleString.equals("invalid") && roleString.equals("Manager")) {
+				List<Ticket> ticketList = TicketRepository.listApproved();
 
-			System.out.println("approved view");
-
-			if (ticketList.size() == 0) {
-				ctx.result("No results");
-			}else {
-				ctx.json(ticketList);
+				if (ticketList.size() == 0) {
+					ctx.result("No results");
+				} else {
+					ctx.json(ticketList);
+				}
+			} else {
+				ctx.result("Unauthorized");
 			}
-
-
+			System.out.println("approved view");
 		});
-		//-------------------------------------------------------------------
+		// -------------------------------------------------------------------
 		// view all denied tickets
 		app.get("tickets/view/denied", (Context ctx) -> {
 
-			List<Ticket> ticketList = TicketRepository.listDenied();
+			String roleString = JwtFactory.parseJwtBody(ctx.cookie("jwt"), "role");
+			if (!roleString.equals("invalid") && roleString.equals("Manager")) {
+				List<Ticket> ticketList = TicketRepository.listDenied();
 
-			System.out.println("denied view");
-
-			if (ticketList.size() == 0) {
-				ctx.result("No results");
-			}else {
-				ctx.json(ticketList);
+				if (ticketList.size() == 0) {
+					ctx.result("No results");
+				} else {
+					ctx.json(ticketList);
+				}
+			} else {
+				ctx.result("Unauthorized");
 			}
+			System.out.println("denied view");
 		});
-		//-------------------------------------------------------------------
+		// -------------------------------------------------------------------
 		// update ticket status
 		// query with a key of status must be affixed to url. ("approved" or "denied")
 		app.put("tickets/{ticket_id}", (Context ctx) -> {
-			int ticketID = Integer.parseInt(ctx.pathParam("ticket_id"));
-			String queryStatus = ctx.queryParam("status");
-			
-			
-			if (TicketRepository.validateTicketId(ticketID) && TicketRepository.validateUpdateStatus(queryStatus)) { 
-				Ticket ticket = TicketRepository.findTicketById(ticketID);
-				
-				if (TicketRepository.validateTicketStatus(ticket)) {
-					ticket = TicketRepository.updateStatus(ticket, queryStatus);
-					ctx.json(ticket);
-				}else {
-					ctx.result("Ticket Status Immutable");
+
+			String roleString = JwtFactory.parseJwtBody(ctx.cookie("jwt"), "role");
+
+			if (!roleString.equals("invalid") && roleString.equals("Manager")) {
+				int ticketID = Integer.parseInt(ctx.pathParam("ticket_id"));
+				String queryStatus = ctx.queryParam("status");
+
+				if (TicketRepository.validateTicketId(ticketID) && TicketRepository.validateUpdateStatus(queryStatus)) {
+					Ticket ticket = TicketRepository.findTicketById(ticketID);
+
+					if (TicketRepository.validateTicketStatus(ticket)) {
+						ticket = TicketRepository.updateStatus(ticket, queryStatus);
+						ctx.json(ticket);
+					} else {
+						ctx.result("Ticket Status Immutable");
+					}
+
+				} else {
+					ctx.result("Invalid input");
 				}
-				
-				
-			}else {
-				ctx.result("Invalid input");
+
+			} else {
+				ctx.result("Unauthorized");
 			}
+
 			System.out.println("update ticket");
 		});
 	}
