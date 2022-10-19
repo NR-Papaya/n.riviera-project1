@@ -5,6 +5,8 @@ import java.sql.Connection;
 
 import java.util.List;
 
+import org.eclipse.jetty.http.HttpStatus;
+
 import com.revature.model.Ticket;
 import com.revature.model.User;
 import com.revature.repository.TicketRepository;
@@ -52,7 +54,7 @@ public class Driver {
 			if (authenticatedUser.getUser_id() > 0) {
 				ctx.cookie("jwt", JwtFactory.jwsStringFactory(authenticatedUser)).result("Login Successful");
 			} else {
-				ctx.result("Invalid Credentials");
+				ctx.result("Invalid Credentials").status(HttpStatus.UNAUTHORIZED_401);
 			}
 			System.out.println("login");
 		});
@@ -84,7 +86,7 @@ public class Driver {
 					ctx.result("Bad request").status(404);
 				}
 			} else {
-				ctx.result("Login required");
+				ctx.result("Unauthorized").status(HttpStatus.UNAUTHORIZED_401);
 			}
 			System.out.println("employee view");
 		});
@@ -101,12 +103,12 @@ public class Driver {
 
 				if (TicketRepository.isValidTicket(newTicket)) {
 					TicketRepository.addTicket(newTicket);
-					ctx.result("Ticket Created");
+					ctx.result("Ticket Created").status(HttpStatus.CREATED_201);
 				} else {
-					ctx.result("Invalid Ticket");
+					ctx.result("Invalid Ticket").status(HttpStatus.NOT_ACCEPTABLE_406);
 				}
 			} else {
-				ctx.result("Unauthorized");
+				ctx.result("Unauthorized").status(HttpStatus.UNAUTHORIZED_401);
 			}
 
 			System.out.println("create ticket");
@@ -124,7 +126,7 @@ public class Driver {
 					ctx.json(ticketList);
 				}
 			} else {
-				ctx.result("Unauthorized");
+				ctx.result("Unauthorized").status(HttpStatus.UNAUTHORIZED_401);
 			}
 			System.out.println("master view");
 		});
@@ -142,7 +144,7 @@ public class Driver {
 					ctx.json(ticketList);
 				}
 			} else {
-				ctx.result("Unauthorized");
+				ctx.result("Unauthorized").status(HttpStatus.UNAUTHORIZED_401);
 			}
 			System.out.println("pending view");
 		});
@@ -160,7 +162,7 @@ public class Driver {
 					ctx.json(ticketList);
 				}
 			} else {
-				ctx.result("Unauthorized");
+				ctx.result("Unauthorized").status(HttpStatus.UNAUTHORIZED_401);
 			}
 			System.out.println("approved view");
 		});
@@ -178,7 +180,7 @@ public class Driver {
 					ctx.json(ticketList);
 				}
 			} else {
-				ctx.result("Unauthorized");
+				ctx.result("Unauthorized").status(HttpStatus.UNAUTHORIZED_401);
 			}
 			System.out.println("denied view");
 		});
@@ -198,16 +200,16 @@ public class Driver {
 
 					if (TicketRepository.validateTicketStatus(ticket)) {
 						ticket = TicketRepository.updateStatus(ticket, queryStatus);
-						ctx.json(ticket);
+						ctx.json(ticket).status(HttpStatus.OK_200);
 					} else {
-						ctx.result("Ticket Status Immutable");
+						ctx.result("Ticket Status Immutable").status(HttpStatus.BAD_REQUEST_400);
 					}
 				} else {
-					ctx.result("Invalid input");
+					ctx.result("Invalid input").status(HttpStatus.BAD_REQUEST_400);
 				}
 
 			} else {
-				ctx.result("Unauthorized");
+				ctx.result("Unauthorized").status(HttpStatus.UNAUTHORIZED_401);
 			}
 			System.out.println("update ticket");
 		});

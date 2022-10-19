@@ -147,7 +147,7 @@ public class TicketRepository {
 
 		try (Connection conn = ConnectionFactory.getConnection()) {
 			stmt = conn.createStatement();
-			set = stmt.executeQuery("select * from tickets where ticket_user_id="+id+" order by ticket_id asc");
+			set = stmt.executeQuery("select * from tickets where ticket_user_id="+id+" order by ticket_id desc");
 
 			while (set.next()) {
 				Ticket newTicket = new Ticket(set.getInt("ticket_id"), set.getFloat("ticket_amount"),
@@ -155,7 +155,6 @@ public class TicketRepository {
 						set.getInt("ticket_user_id"), set.getString("ticket_create_date"));
 
 				ticketList.add(newTicket);
-
 			}
 
 		} catch (SQLException e) {
@@ -189,7 +188,6 @@ public class TicketRepository {
 						set.getInt("ticket_user_id"), set.getString("ticket_create_date"));
 
 				ticketList.add(newTicket);
-
 			}
 
 		} catch (SQLException e) {
