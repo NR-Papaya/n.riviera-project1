@@ -63,14 +63,19 @@ public class Driver {
 		app.get("/logout", (Context ctx) -> {
 			Cookie[] cookies = ctx.req().getCookies();
 
-			for (Cookie cookie : cookies) {
-				if (cookie.getName().equals("jwt")) {
-					cookie.setMaxAge(0);
-					ctx.res().addCookie(cookie);
-					ctx.result("Logout Successful");
-					break;
+			if (cookies != null) {
+				for (Cookie cookie : cookies) {
+					if (cookie.getName().equals("jwt")) {
+						cookie.setMaxAge(0);
+						ctx.res().addCookie(cookie);
+						ctx.result("Logout Successful");
+						break;
+					}
 				}
+			}else {
+				ctx.result("Logout Successful");
 			}
+
 			System.out.println("logout");
 		});
 		// ------------------------------------------------------
@@ -96,7 +101,7 @@ public class Driver {
 
 			String roleString = JwtFactory.parseJwtBody(ctx.cookie("jwt"), "role");
 			String idString = JwtFactory.parseJwtBody(ctx.cookie("jwt"), "user_id");
-			
+
 			if (roleString.equals("Employee")) {
 				Ticket newTicket = ctx.bodyAsClass(Ticket.class);
 				newTicket.setTicket_user_id(Integer.parseInt(idString));
